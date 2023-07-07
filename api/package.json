@@ -1,5 +1,5 @@
 {
-  "name": "api",
+  "name": "foodapi",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -29,6 +29,7 @@
     "sequelize": "^6.3.5"
   },
   "devDependencies": {
+    "@flydotio/dockerfile": "^0.2.16",
     "chai": "^4.2.0",
     "mocha": "^8.2.1",
     "nodemon": "^2.0.6",
