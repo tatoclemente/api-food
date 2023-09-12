@@ -1,18 +1,15 @@
-# fly.toml app configuration file generated for foodapi on 2023-07-06T12:14:31-03:00
+# fly.toml app configuration file generated for apifood on 2023-07-07T11:25:07-03:00
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
 
-app = "foodapi"
+app = "apifood"
 primary_region = "eze"
 
 [http_service]
-  internal_port = 3000
+  internal_port = 8080
   force_https = true
   auto_stop_machines = true
   auto_start_machines = true
   min_machines_running = 0
   processes = ["app"]
-
-[env]
-DB_DEPLOY = "postgresql://postgres:hUNCWUbwvoje1otB5hhA@containers-us-west-172.railway.app:5599/railway"
