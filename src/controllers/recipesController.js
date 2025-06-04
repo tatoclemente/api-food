@@ -48,7 +48,7 @@ const getRecipeById = async (id, source) => {
       image: data.image,
       summary: data.summary,
       healthScore: data.healthScore,
-      steps: data.analyzedInstructions[0]?.steps.map((step) => step.step),
+      steps: data.analyzedInstructions ? data.analyzedInstructions[0]?.steps.map((step) => step.step) : [],
       diets: data.diets,
     };
     
