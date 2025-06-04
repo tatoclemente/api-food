@@ -10,9 +10,15 @@ cloudinary.config({
   });
 
 const uploadImage = async (filePath) => {
-  return await cloudinary.uploader.upload(filePath, {
-    folder: 'pi_food'
-  })
+  try {
+    const result = await cloudinary.uploader.upload(filePath, {
+      folder: 'pi_food'
+    });
+    return result;
+  } catch (error) {
+    console.error('Error al subir la imagen a Cloudinary:', error);
+    throw error;
+  }
 }
 
 module.exports = uploadImage

@@ -89,13 +89,13 @@ const getRecipesByName = async (name) => {
     // Ahora tambien busco todas las recetas (hasta 100) de la API y las unifico
     const apiKey = API_KEY;
     const pageSize = 100;
-
-    const { data } = await axios.get(baseUrl + flag, {
-      params: {
-        apiKey,
-        number: pageSize,
-      },
-    });
+    try {
+      const { data } = await axios.get(baseUrl + flag, {
+        params: {
+          apiKey,
+          number: pageSize,
+        },
+      });
 
     const allRecipesApi = data.results.map((recipe) => {
       return {
@@ -104,14 +104,20 @@ const getRecipesByName = async (name) => {
         image: recipe.image,
         summary: recipe.summary,
         healthScore: recipe.healthScore,
-        steps: recipe.analyzedInstructions[0]?.steps?.map((step) => step.step),
+        steps: recipe.analyzedInstructions ? recipe.analyzedInstructions[0]?.steps?.map((step) => step.step) : [],
         diets: recipe.diets,
       };
     });
-
     const allRecipes = [...allRecipesDB, ...allRecipesApi];
 
     return allRecipes;
+      
+    } catch (error) {
+      console.error("Error fetching recipes from API:", error);
+      return { message: "Error fetching recipes from API" };
+    }
+
+    
 
   } else {
 
@@ -164,7 +170,7 @@ const getRecipesByName = async (name) => {
         image: recipe.image,
         summary: recipe.summary,
         healthScore: recipe.healthScore,
-        steps: recipe.analyzedInstructions[0]?.steps.map((step) => step.step),
+        steps: recipe.analyzedInstructions ? recipe.analyzedInstructions[0]?.steps.map((step) => step.step): [],
         diets: recipe.diets,
       };
     });
@@ -190,29 +196,32 @@ const createRecipe = async (recipe) => {
   )
     throw Error("Faltan datos para crear la receta");
 
-  const newRecipe = await Recipe.create({
-    name: recipe.name,
-    image: recipe.image,
-    summary: recipe.summary,
-    healthScore: recipe.healthScore,
-    steps: recipe.steps,
-  });
+  try {
+    const newRecipe = await Recipe.create({
+      name: recipe.name,
+      image: recipe.image,
+      summary: recipe.summary,
+      healthScore: recipe.healthScore,
+      steps: recipe.steps,
+    });
+  
+    // Si hay dietas, busco las dietas que tengo en mi base de datos y filtro las que coinciden con las que me llegan por body
+  
+    const dietDB = await Diet.findAll({
+      where: { name: recipe.diets },
+    });
+  
+    // agrego las dietas a mi receta con el metodo addDiet que me proporciona sequelize al relacionar mis modelos
+    await newRecipe.addDiet(dietDB);
+  
+    const createdRecipe = await getRecipeById(newRecipe.id, "bdd")
+  
 
-  // Si hay dietas, busco las dietas que tengo en mi base de datos y filtro las que coinciden con las que me llegan por body
-
-  const dietDB = await Diet.findAll({
-    where: { name: recipe.diets },
-  });
-
-  // agrego las dietas a mi receta con el metodo addDiet que me proporciona sequelize al relacionar mis modelos
-  await newRecipe.addDiet(dietDB);
-
-  const createdRecipe = await getRecipeById(newRecipe.id, "bdd")
-
-  if (createdRecipe) {
-    return createdRecipe;
+    return createdRecipe;  
+    
+  } catch (error) {
+    throw Error("Error uploading recipe");
   }
-  throw Error("Error uploading recipe");
 };
 
 module.exports = {

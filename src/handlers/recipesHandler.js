@@ -55,7 +55,6 @@ const createRecipeHandler = async (req, res) => {
   try {
     const result = await uploadImage(req.files.image.tempFilePath);
 
-
     const imageUrl = result.secure_url;
     
     if(imageUrl) {
